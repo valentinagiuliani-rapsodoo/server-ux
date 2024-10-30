@@ -163,21 +163,21 @@ class TierValidation(models.AbstractModel):
         return self._description
 
     def _get_to_validate_message(self):
-        return (
-            """<i class="fa fa-info-circle" /> %s"""
-            % _("This %s needs to be validated")
-            % self._get_to_validate_message_name()
+        return _(
+            f"""<i class="fa fa-info-circle/> This
+                {self._get_to_validate_message_name()} needs to be validated
+            """
         )
 
     def _get_validated_message(self):
-        msg = """<i class="fa fa-thumbs-up" /> %s""" % _(
-            """Operation has been <b>validated</b>!"""
+        msg = _(
+            """"<i class="fa fa-thumbs-up"/> Operation has been <b>validated</b>!"""
         )
         return self.validated and msg or ""
 
     def _get_rejected_message(self):
-        msg = """<i class="fa fa-thumbs-down" /> %s""" % _(
-            """Operation has been <b>rejected</b>."""
+        msg = _(
+            """<i class="fa fa-thumbs-down"/> Operation has been <b>rejected</b>."""
         )
         return self.rejected and msg or ""
 
@@ -753,10 +753,13 @@ class TierValidation(models.AbstractModel):
     @api.model
     def _update_counter(self, review_counter):
         self.review_ids._compute_can_review()
-        notifications = []
         channel = "base.tier.validation/updated"
-        notifications.append([self.env.user.partner_id, channel, review_counter])
-        self.env["bus.bus"]._sendmany(notifications)
+        self.env["bus.bus"]._sendone(
+            channel,
+            "inbox",
+            f"Base tier validation for partner "
+            f"{self.env.user.partner_id}, counter {review_counter}",
+        )
 
     def unlink(self):
         self.mapped("review_ids").unlink()

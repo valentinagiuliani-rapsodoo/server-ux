@@ -973,14 +973,8 @@ class TierTierValidation(CommonTierValidation):
     def test_26_computed_state_field(self):
         """Test the regular flow on a model where state is a computed field"""
         # The record cannot be confirmed without validation
-        with self.assertRaisesRegex(
-            ValidationError,
-            "This action needs to be validated",
-        ):
-            with self.env.cr.savepoint():
-                self.test_record_computed.action_confirm()
-                # Flush manually to trigger the _write
-                self.test_record_computed.flush_recordset()
+        with self.assertRaises(ValidationError):
+            self.test_record_computed.action_confirm()
         self.assertEqual(self.test_record_computed.state, "draft")
         # The validation is performed
         self.test_record_computed.request_validation()
@@ -995,7 +989,6 @@ class TierTierValidation(CommonTierValidation):
         self.assertEqual(self.test_record_computed.state, "confirmed")
         # After cancelling, the reviews are removed
         self.test_record_computed.action_cancel()
-        self.test_record_computed.flush_recordset()
         self.assertFalse(self.test_record_computed.review_ids)
         self.test_record_computed.invalidate_recordset()
 

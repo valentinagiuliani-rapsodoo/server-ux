@@ -20,6 +20,8 @@ exclude: |
   /tests/samples/.*|
   # You don't usually want a bot to modify your legal texts
   (LICENSE.*|COPYING.*)
+  # Modules
+  ^base_tier_validation/static/src/components/.*$|
 default_language_version:
   python: python3
   node: "22.9.0"

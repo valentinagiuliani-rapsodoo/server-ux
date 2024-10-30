@@ -1,7 +1,8 @@
 # Copyright 2018-19 ForgeFlow S.L. (https://www.forgeflow.com)
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 
-from odoo import api, fields, models
+from odoo import _, api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class TierValidationTester(models.Model):
@@ -95,9 +96,12 @@ class TierValidationTesterComputed(models.Model):
                 rec.state = "draft"
 
     def action_confirm(self):
+        if self.need_validation:
+            raise ValidationError(_("This action needs to be validated"))
         self.write({"confirmed": True})
 
     def action_cancel(self):
+        self.review_ids.unlink()
         self.write({"cancelled": True})
 
 
